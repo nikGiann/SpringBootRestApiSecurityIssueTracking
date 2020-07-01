@@ -6,30 +6,30 @@ use issuetracking;
 
 
 CREATE TABLE `user` (
-  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(30) not null,
-  `firstname` varchar(255) NOT NULL,
-  `lastname` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `active` int(11) DEFAULT NULL,
-   PRIMARY KEY (`user_id`),
+  `firstname` varchar(255),
+  `lastname` varchar(255),
+  `password` varchar(255) not null,
+  `active` int(11),
+   PRIMARY KEY (`uid`),
    UNIQUE(`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `role` (
-  `role_id` int(11) NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`role_id`)
+  `rid` int(11) NOT NULL AUTO_INCREMENT,
+  `rname` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`rid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `user_role` (
-  `user_id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`role_id`),
-  UNIQUE KEY `UK_roleid` (`role_id`),
-  CONSTRAINT `FK_userid` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  CONSTRAINT `FK_roleid` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`)
+  `uid` int(11) NOT NULL,
+  `rid` int(11) NOT NULL,
+  PRIMARY KEY (`uid`,`rid`),
+  UNIQUE KEY `UK_rid` (`rid`),
+  CONSTRAINT `FK_userid` FOREIGN KEY (`uid`) REFERENCES `user` (`uid`),
+  CONSTRAINT `FK_roleid` FOREIGN KEY (`rid`) REFERENCES `role` (`rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- creating user username:admin - password:1234
@@ -41,11 +41,11 @@ insert into issuetracking.USER values(1,'admin','nikos','giannopoulos','$2a$10$z
 insert into issuetracking.USER values(2,'komvot','Kyriakos',' Komvoteas','$2a$10$zb2yH7iMiINVRuqVCnoOIO/0IaxTtHY.Elp62pYkJEHOyWabEXv.S',1);
 
 
--- creating ADMIN role
-insert into issuetracking.ROLE values(1,'ADMIN');
-insert into issuetracking.ROLE values(2,'USER');
+-- creating ADMIN and USER role
+insert into issuetracking.ROLE values(1,'ROLE_ADMIN');
+insert into issuetracking.ROLE values(2,'ROLE_USER');
 
--- Mapping ADMIN role id (1) to shekhar user userid (1)
+-- Mapping roles with users
 insert into issuetracking.USER_ROLE values(1,1);
 insert into issuetracking.USER_ROLE values(2,2);
 
@@ -53,20 +53,17 @@ CREATE TABLE `issue` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
   `descr` varchar(50) NOT NULL,
-  `type` varchar(50) NOT NULL,
+  `type` varchar(50),
   `assignedto` int(11),
   `createdateissue` timestamp,
   `editdateissue` timestamp,
   `lastuseredit` int(11),
   `usercreateissue` int(11),
-  `statusissue` varchar(50) NOT NULL,
+  `statusissue` varchar(50),
   PRIMARY KEY (`id`),
-  KEY `fk_assignedtouser` (`assignedto`),
-  KEY `fk_lastuseredit` (`lastuseredit`),
-  KEY `fk_usercreateissue` (`usercreateissue`),
-  CONSTRAINT `fk_assignedtouser` FOREIGN KEY (`assignedto`) REFERENCES `user` (`user_id`),
-  CONSTRAINT `fk_lastuseredit` FOREIGN KEY (`lastuseredit`) REFERENCES `user` (`user_id`),
-  CONSTRAINT `fk_usercreateissue` FOREIGN KEY (`usercreateissue`) REFERENCES `user` (`user_id`)
+  CONSTRAINT `fk_assignedtouser` FOREIGN KEY (`assignedto`) REFERENCES `user` (`uid`),
+  CONSTRAINT `fk_lastuseredit` FOREIGN KEY (`lastuseredit`) REFERENCES `user` (`uid`),
+  CONSTRAINT `fk_usercreateissue` FOREIGN KEY (`usercreateissue`) REFERENCES `user` (`uid`)
 ) ;
 
 insert into issuetracking.issue values ( 1,'problem','has a problem', 'Bug', 1, '2019-10-12 00:21:00', '2019-10-20 00:19:30',1, 1,'new'),
